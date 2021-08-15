@@ -1,0 +1,17 @@
+#!/bin/bash 
+k=0;
+
+for i in `telegram-cli -C -W -e "dialog_list 11" | tail -n 12 | head -n 10 | cut -d' ' -f2-10 | cut -d':' -f1 | tr ' ' '_'`
+do
+    declare contact_$k=$i;
+    ((k++));
+done;
+
+
+dest=`kdialog --combobox Contact: $contact_0 $contact_1 $contact_2 $contact_3 $contact_4 $contact_5 $contact_6 $contact_7 $contact_8 $contact_9;`
+
+telegram-cli -W -e "send_file $dest '$1'"
+
+kdialog --passivepopup "File sent to $dest";
+
+exit 0;

@@ -1,0 +1,1 @@
+cls;while($true){node .\filehandler.js}
