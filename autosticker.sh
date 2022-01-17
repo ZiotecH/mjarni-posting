@@ -1,6 +1,6 @@
 #!/bin/sh
 file=`cat request`
-emoji=$'\U1F49A'
+emoji=`cat emoji`
 echo $file
 rm ~/.telegram-cli/state -fv
 telegram-cli -W -e "msg Stickers /addsticker"

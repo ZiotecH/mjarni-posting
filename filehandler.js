@@ -3,7 +3,9 @@ const http = require('http');
 const fs = require('fs');
 const readline = require('readline');
 const { ifError } = require('assert');
+const emojiTable = JSON.parse(fs.readFileSync("./emoji_list.json"));
 var spawn = require("child_process").spawn;
+var chosenEmoji = "greenheart"
 
 var rl = readline.createInterface({
     input: process.stdin,
@@ -134,18 +136,29 @@ http.createServer(function (request, response){
                 uploader = decodedJSON.uploader
             }
 
-            adminDataString = timeStamp()+" | "+decodedJSON.uploader+" | "+request.socket.remoteAddress+" | "+decodedJSON.name+" | "+decodedJSON.ext + "\n"
+            if(!decodedJSON.emoji){
+                chosenEmoji = emojiTable[131][1]
+            }else{
+                for(var i = 0; i<emojiTable.length;i++){
+                  if(emojiTable[i][0] == decodedJSON.emoji){
+                    chosenEmoji = emojiTable[i][1]
+                  }  
+                }
+            }
+
+            adminDataString = timeStamp()+" | "+decodedJSON.uploader+" | "+request.socket.remoteAddress+" | "+decodedJSON.name+" | "+decodedJSON.ext + " | " + decodedJSON.emoji + "\n"
 
             console.log(timeStamp()+" [INFO] mjarni request: received payload: "+fileString);
             fs.writeFileSync("./"+target+"/"+fileString,decodedJSON.data,'base64',function(err){console.log(err)});
             if(filterArray.includes(decodedJSON.ext)){
                 logReverser();
-                fs.writeFileSync("./request",fileString)
-                fs.appendFileSync("./tmp_upload.log","\n<span class=\"logitem\">"+timeStamp()+" | "+uploader+" uploaded "+decodedJSON.name+"."+decodedJSON.ext+"</span>");
+                //fs.writeFileSync("./request",fileString)
+                fs.appendFileSync("./tmp_upload.log","\n<span class=\"logitem\">"+timeStamp()+" | "+uploader+" uploaded "+decodedJSON.name+"."+decodedJSON.ext+" with "+chosenEmoji+"</span>");
                 logReverser();
                 imageHandler();
             }
             fs.appendFileSync("./adminlog",adminDataString);
+            fs.writeFileSync("./emoji",chosenEmoji);
             response.end(timeStamp()+" Server recieved "+fileString+".");
         });
     }
