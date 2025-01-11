@@ -3,9 +3,9 @@ const http = require('http');
 const fs = require('fs');
 const readline = require('readline');
 const { ifError } = require('assert');
-const emojiTable = JSON.parse(fs.readFileSync("./emoji_list.json"));
+const emojiTable = JSON.parse(fs.readFileSync("./emojitable.json"));
 var spawn = require("child_process").spawn;
-var chosenEmoji = "greenheart"
+var chosenEmoji = emojiTable[0].emoji
 
 var rl = readline.createInterface({
     input: process.stdin,
@@ -129,7 +129,7 @@ http.createServer(function (request, response){
             timeString = year+"-"+month+"-"+date+"_"+hour+"-"+minute+"-"+second;
             var decodedJSON = JSON.parse(POSTData);
             var uploader;
-            fileString = timeString+"-"+decodedJSON.name+"."+decodedJSON.ext;
+            fileString = timeString+"-"+decodedJSON.name.toString().replace(/\s+/g,"-")+"."+decodedJSON.ext;
             if(decodedJSON === undefined ){
                 uploader = request.socket.remoteAddress
             }else{
@@ -139,11 +139,7 @@ http.createServer(function (request, response){
             if(!decodedJSON.emoji){
                 chosenEmoji = emojiTable[131][1]
             }else{
-                for(var i = 0; i<emojiTable.length;i++){
-                  if(emojiTable[i][0] == decodedJSON.emoji){
-                    chosenEmoji = emojiTable[i][1]
-                  }  
-                }
+                chosenEmoji = decodedJSON.emoji
             }
 
             adminDataString = timeStamp()+" | "+decodedJSON.uploader+" | "+request.socket.remoteAddress+" | "+decodedJSON.name+" | "+decodedJSON.ext + " | " + decodedJSON.emoji + "\n"
